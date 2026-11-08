@@ -1,0 +1,43 @@
+export const districts = [
+  { name: "Balaka", region: "Southern" }, { name: "Blantyre", region: "Southern" },
+  { name: "Chikwawa", region: "Southern" }, { name: "Chiradzulu", region: "Southern" },
+  { name: "Chitipa", region: "Northern" }, { name: "Dedza", region: "Central" },
+  { name: "Dowa", region: "Central" }, { name: "Karonga", region: "Northern" },
+  { name: "Kasungu", region: "Central" }, { name: "Likoma", region: "Northern" },
+  { name: "Lilongwe", region: "Central" }, { name: "Machinga", region: "Southern" },
+  { name: "Mangochi", region: "Southern" }, { name: "Mchinji", region: "Central" },
+  { name: "Mulanje", region: "Southern" }, { name: "Mwanza", region: "Southern" },
+  { name: "Mzimba", region: "Northern" }, { name: "Neno", region: "Southern" },
+  { name: "Nkhata Bay", region: "Northern" }, { name: "Nkhotakota", region: "Central" },
+  { name: "Nsanje", region: "Southern" }, { name: "Ntcheu", region: "Central" },
+  { name: "Ntchisi", region: "Central" }, { name: "Phalombe", region: "Southern" },
+  { name: "Rumphi", region: "Northern" }, { name: "Salima", region: "Central" },
+  { name: "Thyolo", region: "Southern" }, { name: "Zomba", region: "Southern" },
+] as const;
+
+// Seed station names are examples from Petroda's published station directory.
+// They have no fuel-status report and should be confirmed/edited by local users.
+export const sampleStations = [
+  ["Petroda Tsiranana", "Blantyre", "Along Zomba Road, next to Unilever"],
+  ["Petroda Munif", "Blantyre", "Limbe, next to Limbe Police Station"],
+  ["Petroda Mandala", "Blantyre", "Mount Pleasant, near College of Medicine"],
+  ["Petroda Clock Tower", "Blantyre", "Clock Tower Roundabout"],
+  ["Petroda Mbayani", "Blantyre", "Along M1 Road, Mbayani"],
+  ["Petroda Kameza", "Blantyre", "Chileka Road, Kameza Roundabout"],
+  ["Petroda Biwi", "Lilongwe", "Biwi Triangle"],
+  ["Petroda Bunda", "Lilongwe", "Bunda Turn-off"],
+  ["Petroda Area 25", "Lilongwe", "Near Petroda Depot"],
+  ["Petroda Area 4", "Lilongwe", "Near Lilongwe Central Hospital"],
+  ["Petroda Area 43", "Lilongwe", "Opposite Area 30 Police"],
+  ["Petroda Area 47", "Lilongwe", "Along Mchinji Road"],
+  ["Petroda Area 46", "Lilongwe", "Lilongwe By-pass Road"],
+  ["Petroda Chitukuko", "Lilongwe", "Area 43"],
+  ["Petroda Salima Turn-off", "Lilongwe", "Salima Turn-off"],
+  ["Petroda Zomba", "Zomba", "Zomba town"], ["Petroda Liwonde", "Machinga", "Liwonde"],
+  ["Petroda Mangochi", "Mangochi", "Mangochi town"], ["Petroda Luchenza", "Thyolo", "Luchenza"],
+  ["Petroda Balaka", "Balaka", "Balaka town"], ["Petroda Ntcheu", "Ntcheu", "Ntcheu town"],
+  ["Petroda Mwanza", "Mwanza", "Mwanza town"], ["Petroda Kasungu", "Kasungu", "Kasungu town"],
+  ["Petroda Salima Boma", "Salima", "Salima Boma"], ["Petroda Mchinji", "Mchinji", "Mchinji town"],
+  ["Petroda Mzuzu", "Mzimba", "Mzuzu"], ["Petroda Mzimba", "Mzimba", "Mzimba town"],
+  ["Petroda Karonga", "Karonga", "Karonga town"],
+] as const;
