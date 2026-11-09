@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Fuel Wanga — Find fuel nearby",
+  title: "Fuel Wanga - Find fuel nearby",
   description: "Community fuel updates for drivers in Malawi.",
   icons: {
     icon: [
