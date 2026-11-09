@@ -77,8 +77,9 @@ export default function Home() {
   }
 
   const regions = ["Northern", "Central", "Southern"];
-  return <main className="app-shell">
-    <header className="topbar"><a className="brand" href="#home"><span className="brand-icon">FW</span><span>Fuel Wanga</span></a><span className="community-tag">COMMUNITY FUEL UPDATES</span></header>
+  return <>
+    <header className="topbar"><div className="app-shell topbar-inner"><a className="brand" href="#home"><span className="brand-icon">FW</span><span>Fuel Wanga</span></a><span className="community-tag">COMMUNITY FUEL UPDATES</span></div></header>
+    <main className="app-shell">
     <section className="intro" id="home"><span className="kicker">FUEL INFORMATION FOR MALAWI</span><h1>Find fuel near you.<br/><em>Help others find it too.</em></h1><p>See what drivers have reported. Share what you see at the station.</p></section>
     <section className="finder" aria-label="Find a filling station">
       <div className="district-label"><label htmlFor="district">Choose your district</label><span>{districts.length} districts covered</span></div>
@@ -103,5 +104,6 @@ export default function Home() {
       {dialog === "report" && selected && <form onSubmit={submit}><span className="kicker">COMMUNITY FUEL UPDATE</span><h2 id="modal-title">What did you see?</h2><p className="modal-help">{selected.name} · {selected.area}, {selected.district}</p><label htmlFor="report-status">Fuel situation</label><select id="report-status" name="status"><option>Available</option><option>Low</option><option>No fuel</option></select><label htmlFor="report-fuel">Fuel type</label><select id="report-fuel" name="fuel"><option>Both</option><option>Petrol</option><option>Diesel</option></select><label htmlFor="report-queue">Queue</label><select id="report-queue" name="queue"><option>No queue update</option><option>No queue</option><option>Short queue</option><option>Medium queue</option><option>Long queue</option></select><label className="honesty"><input type="checkbox" required/> I checked this station in person.</label><button className="primary-button full" disabled={busy}>{busy ? "Sharing…" : "Share update"}</button><p className="small-note">No name, phone number or account needed. One update per station every 15 minutes on this device.</p></form>}
       {formError && <p className="form-error" role="alert">{formError}</p>}
     </section></div>}
-  </main>;
+  </main>
+  </>;
 }
