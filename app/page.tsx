@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { districts } from "@/lib/data";
@@ -6,7 +6,7 @@ import { districts } from "@/lib/data";
 type Status = "Available" | "Low" | "No fuel";
 type Fuel = "Petrol" | "Diesel" | "Both";
 type FuelReport = { status: Status | null; queue: string | null; lastReportAt: string | null; confirmations: number; conflict: boolean };
-type Station = { id: string; name: string; district: string; area: string; latitude: number | null; longitude: number | null; source: string | null; sourceUrl: string | null; sourceCheckedAt: string | null; status: Status | null; fuel: Fuel | null; queue: string | null; lastReportAt: string | null; reportCount: number; confirmations: number; conflict: boolean; fuelReports: Record<"Petrol" | "Diesel", FuelReport> };
+type Station = { id: string; name: string; district: string; area: string; latitude: number | null; longitude: number | null; status: Status | null; fuel: Fuel | null; queue: string | null; lastReportAt: string | null; reportCount: number; confirmations: number; conflict: boolean; fuelReports: Record<"Petrol" | "Diesel", FuelReport> };
 const statusLabel: Record<Status, string> = { Available: "Fuel available", Low: "Running low", "No fuel": "No fuel" };
 const STATION_PAGE_SIZE = 6;
 
@@ -115,7 +115,7 @@ export default function Home() {
       <p className="truth-note"><span>ℹ</span> A missing or old report does not mean the station is out of fuel.</p>
       {loading ? <div className="state-card">Loading stations…</div> : error ? <div className="state-card error-state"><p>{error}</p><button className="secondary-button" onClick={() => void loadStations()}>Try again</button></div> : visibleStations.length ? <><div className="station-list">{displayedStations.map(station => { const report = getDisplayedReport(station); return <article className="station-card" key={station.id}><div className="station-top"><div className="pump-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16M3 21h14M7 7h6v5H7zM16 8h2l2 2v6a2 2 0 0 1-4 0v-3M18 19v2"/></svg></div><div className="station-title"><h3>{station.name}</h3><p>{station.area} · {station.district}</p></div><span className={report.conflict ? "status status-low" : report.status ? `status status-${report.status.toLowerCase().replace(" ", "-")}` : "status status-unknown"}><i/>{report.conflict ? "Reports disagree" : report.status ? statusLabel[report.status] : "No fuel update"}</span></div>
         <div className="station-details">{report.queue && <span>Queue: {report.queue}</span>}<span className={report.lastReportAt ? "fresh-age" : "old-age"}>◷ {ageLabel(report.lastReportAt)}</span>{report.conflict ? <span className="old-age">Check before travelling</span> : report.confirmations > 0 && <span className="confirm-count">{report.confirmations} recent report{report.confirmations === 1 ? "" : "s"}</span>}</div>
-        <div className="station-actions"><button onClick={() => openDialog(station)}>Update fuel status</button><a className="map-link" href={directionsUrl(station).url}>Open directions</a></div></article>; })}</div>{visibleStationCount < visibleStations.length && <button className="view-more" onClick={() => setVisibleStationCount(count => count + STATION_PAGE_SIZE)}>View more stations</button>}</> : <div className="empty-state"><span aria-hidden="true">⌕</span><h3>{search || availableOnly ? "No matching stations" : `No stations listed in ${district} yet`}</h3><p>{search || availableOnly ? "Try changing your search or filters." : "Station listings are added from MERA and other verified sources."}</p></div>}
+        <div className="station-actions"><button onClick={() => openDialog(station)}>Update fuel status</button><a className="map-link" href={directionsUrl(station).url}>Open directions</a></div></article>; })}</div>{visibleStationCount < visibleStations.length && <button className="view-more" onClick={() => setVisibleStationCount(count => count + STATION_PAGE_SIZE)}>View more stations</button>}</> : <div className="empty-state"><span aria-hidden="true">⌕</span><h3>{search || availableOnly ? "No matching stations" : `No stations listed in ${district} yet`}</h3><p>{search || availableOnly ? "Try changing your search or filters." : "We are still building the station list for this district."}</p></div>}
       <div className="count-note">Showing {displayedStations.length} of {visibleStations.length} station{visibleStations.length === 1 ? "" : "s"} · Updates expire after 3 hours</div>
     </section>
     <section className="how"><span className="kicker">SIMPLE FOR EVERYONE</span><h2>How Fuel Wanga works</h2><div className="how-grid"><article><b>1</b><h3>Choose your district</h3><p>See stations in your area. No map or account needed.</p></article><article><b>2</b><h3>Check the update time</h3><p>Fuel reports are recent for up to 3 hours. Old reports are hidden.</p></article><article><b>3</b><h3>Share what you saw</h3><p>Report fuel and queue after visiting a station in person.</p></article></div></section>
@@ -129,3 +129,4 @@ export default function Home() {
   </main>
   </>;
 }
+

@@ -25,7 +25,7 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       // Next.js inline scripts + React hydration need 'unsafe-inline'; nonce approach is ideal but complex
-      "script-src 'self' 'unsafe-inline'",
+      `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
       // Allow inline styles used by Next.js and the app
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // Google Fonts
