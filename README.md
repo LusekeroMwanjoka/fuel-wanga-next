@@ -41,6 +41,7 @@ A mobile-friendly community fuel finder built with Next.js and Supabase. It cove
 
 The browser calls the Next.js API only. The API uses the Supabase secret key on the server, never in browser code. The schema enables Row Level Security, revokes direct access from `anon` and `authenticated`, and grants table/function access only to `service_role`. The report operation runs as a database function so its validation and rate limit happen atomically. The Supabase secret key bypasses RLS, so keep it private and only set it in server environment variables.
 
+
 This is an open, anonymous community MVP. Its random browser identifier discourages quick repeated reports but is not identity verification; users can reset browser storage or switch devices.
 
 ## Included station examples
