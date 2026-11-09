@@ -1,12 +1,5 @@
 import type { NextConfig } from "next";
 
-// Enable Cloudflare bindings during local `next dev`
-// The conditional keeps it from breaking the standard build
-if (process.env.NODE_ENV === "development") {
-  const { setupDevPlatform } = await import("@cloudflare/next-on-pages/next-dev");
-  await setupDevPlatform();
-}
-
 const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -24,12 +17,13 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
+      "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://partner.googleadservices.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      "img-src 'self' data:",
-      "connect-src 'self'",
+      "img-src 'self' data: https://pagead2.googlesyndication.com",
+      "connect-src 'self' https://pagead2.googlesyndication.com",
       "object-src 'none'",
+      "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",

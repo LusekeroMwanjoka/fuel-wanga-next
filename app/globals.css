@@ -478,8 +478,20 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 /* ── Info pages ──────────────────────────────────────────────────────────── */
 .info-shell { max-width: 720px; margin: 0 auto; padding: 0 24px 60px; }
 .info-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; border-bottom: 1px solid var(--line); margin-bottom: 32px; }
-.info-content { line-height: 1.7; }
-.info-footer { border-top: 1px solid var(--line); padding: 20px 0; display: flex; gap: 16px; font-size: 12px; color: var(--slate); }
+.info-content { line-height: 1.7; color: var(--ink); }
+.info-content h2 { font: 700 20px Manrope, sans-serif; margin: 32px 0 10px; color: var(--ink); }
+.info-content h3 { font: 700 15px 'DM Sans', sans-serif; margin: 20px 0 6px; color: var(--ink); }
+.info-content p { margin: 0 0 14px; color: var(--slate); font-size: 15px; }
+.info-content ul { margin: 0 0 14px; padding-left: 22px; color: var(--slate); font-size: 15px; }
+.info-content ul li { margin-bottom: 8px; line-height: 1.65; }
+.info-content a { color: var(--green); }
+.info-content a:hover { color: var(--green-dark); }
+.info-content code { font-family: monospace; font-size: 13px; background: var(--green-pale); padding: 2px 6px; border-radius: 4px; color: var(--green-dark); }
+.info-lead { font-size: 17px !important; color: var(--ink) !important; font-weight: 500; line-height: 1.6 !important; margin-bottom: 28px !important; }
+.info-callout { background: var(--green-pale); border-left: 3px solid var(--green); border-radius: 0 8px 8px 0; padding: 14px 18px; font-size: 13px !important; color: var(--ink) !important; margin: 24px 0 0 !important; line-height: 1.6 !important; }
+.info-footer { border-top: 1px solid var(--line); padding: 20px 0; display: flex; gap: 16px; font-size: 12px; color: var(--slate); flex-wrap: wrap; align-items: center; }
+.info-footer a { color: var(--green); text-decoration: none; font-weight: 600; }
+.info-footer a:hover { text-decoration: underline; }
 .back-link { font-size: 13px; font-weight: 600; color: var(--green); text-decoration: none; }
 
 /* ── Responsive: 650px ────────────────────────────────────────────────────── */

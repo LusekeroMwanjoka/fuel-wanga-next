@@ -398,6 +398,7 @@ export default function Home() {
                 <a href="/#home">Home</a>
                 <a href="/about">About</a>
                 <a href="/how-it-works">How it works</a>
+                <a href="/privacy">Privacy Policy</a>
               </nav>
             </div>
 
