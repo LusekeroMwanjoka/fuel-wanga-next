@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { clearStationAdminSession } from "@/lib/auth";
+import { clearStationAdminCookie } from "@/lib/auth";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 export async function POST() {
-  await clearStationAdminSession();
-  return NextResponse.json({ ok: true });
+  const res = NextResponse.json({ ok: true });
+  return clearStationAdminCookie(res);
 }

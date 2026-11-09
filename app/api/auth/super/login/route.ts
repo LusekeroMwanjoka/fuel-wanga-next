@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { verifyPassword, setSuperAdminSession } from "@/lib/auth";
+import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
+import { verifyPassword, applySuperAdminSession } from "@/lib/auth";
 import { isRateLimited, clientIp } from "@/lib/rateLimit";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
-  // Strict brute-force protection: 3 attempts per IP per 30 minutes
   const ip = clientIp(request);
   if (isRateLimited(`super-login:${ip}`, 3, 30 * 60 * 1000)) {
     return NextResponse.json(
@@ -24,19 +23,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Incorrect email or password." }, { status: 401 });
   }
 
-  const { data: admin } = await supabaseAdmin
+  const { data: admin } = await getSupabaseAdmin()
     .from("super_admins")
     .select("id, password_hash")
     .eq("email", email)
     .single();
 
-  const dummyHash = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-  const valid = await verifyPassword(password, admin?.password_hash ?? dummyHash);
+  const dummy =
+    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+  const valid = await verifyPassword(password, admin?.password_hash ?? dummy);
 
   if (!admin || !valid) {
     return NextResponse.json({ error: "Incorrect email or password." }, { status: 401 });
   }
 
-  await setSuperAdminSession(admin.id);
-  return NextResponse.json({ ok: true });
+  const res = NextResponse.json({ ok: true });
+  return applySuperAdminSession(res, admin.id);
 }

@@ -1,24 +1,23 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getStationAdminSession } from "@/lib/auth";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  const session = await getStationAdminSession();
+export async function GET(request: NextRequest) {
+  const session = await getStationAdminSession(request);
   if (!session) return NextResponse.json({ admin: null });
 
-  // Fetch station name and current active admin updates
   const cutoff = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
 
   const [{ data: station }, { data: updates }] = await Promise.all([
-    supabaseAdmin
+    getSupabaseAdmin()
       .from("stations")
       .select("id, name, district, area")
       .eq("id", session.station_id)
       .single(),
-    supabaseAdmin
+    getSupabaseAdmin()
       .from("admin_updates")
       .select("id, fuel, status, created_at")
       .eq("station_id", session.station_id)

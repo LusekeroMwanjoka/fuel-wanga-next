@@ -1,22 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { getStationAdminSession } from "@/lib/auth";
 import { isRateLimited, clientIp } from "@/lib/rateLimit";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 const VALID_FUELS = ["Petrol", "Diesel"];
 const VALID_STATUSES = ["Available", "Low", "No fuel"];
 
 export async function POST(request: NextRequest) {
-  // Must be authenticated as a station admin
-  const session = await getStationAdminSession();
+  const session = await getStationAdminSession(request);
   if (!session) {
     return NextResponse.json({ error: "Not authorised." }, { status: 401 });
   }
 
-  // Rate limit: 30 updates per admin per hour
   const ip = clientIp(request);
   if (isRateLimited(`admin-update:${session.id}:${ip}`, 30, 60 * 60 * 1000)) {
     return NextResponse.json(
@@ -36,8 +34,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // The RPC enforces that admin_id matches station_id — prevents URL/payload tampering
-  const { data, error } = await supabaseAdmin.rpc("submit_admin_update", {
+  const { data, error } = await getSupabaseAdmin().rpc("submit_admin_update", {
     p_admin_id: session.id,
     p_station_id: session.station_id,
     p_fuel: fuel,

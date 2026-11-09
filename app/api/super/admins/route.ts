@@ -1,23 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { getSuperAdminSession, hashPassword } from "@/lib/auth";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-async function requireSuper() {
-  const session = await getSuperAdminSession();
-  if (!session) return null;
-  return session;
-}
+export async function GET(request: NextRequest) {
+  const session = await getSuperAdminSession(request);
+  if (!session) return NextResponse.json({ error: "Not authorised." }, { status: 401 });
 
-// GET: list all station admins with their station info
-export async function GET() {
-  if (!await requireSuper()) {
-    return NextResponse.json({ error: "Not authorised." }, { status: 401 });
-  }
-
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("station_admins")
     .select("id, email, display_name, is_active, created_at, station_id, stations(id, name, district)")
     .order("created_at", { ascending: false });
@@ -26,11 +18,9 @@ export async function GET() {
   return NextResponse.json({ admins: data });
 }
 
-// POST: create a new station admin account
 export async function POST(request: NextRequest) {
-  if (!await requireSuper()) {
-    return NextResponse.json({ error: "Not authorised." }, { status: 401 });
-  }
+  const session = await getSuperAdminSession(request);
+  if (!session) return NextResponse.json({ error: "Not authorised." }, { status: 401 });
 
   const body = await request.json().catch(() => null);
   const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
@@ -51,19 +41,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Verify station exists
-  const { data: station } = await supabaseAdmin
+  const { data: station } = await getSupabaseAdmin()
     .from("stations")
     .select("id")
     .eq("id", stationId)
     .single();
-  if (!station) {
-    return NextResponse.json({ error: "Station not found." }, { status: 404 });
-  }
+  if (!station) return NextResponse.json({ error: "Station not found." }, { status: 404 });
 
   const passwordHash = await hashPassword(password);
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("station_admins")
     .insert({ email, password_hash: passwordHash, display_name: displayName || email, station_id: stationId })
     .select("id, email, display_name, is_active, station_id")

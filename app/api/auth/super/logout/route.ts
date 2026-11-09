@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { clearSuperAdminSession } from "@/lib/auth";
+import { clearSuperAdminCookie } from "@/lib/auth";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 export async function POST() {
-  await clearSuperAdminSession();
-  return NextResponse.json({ ok: true });
+  const res = NextResponse.json({ ok: true });
+  return clearSuperAdminCookie(res);
 }

@@ -1,58 +1,42 @@
-import "server-only";
-
-/**
- * Simple in-memory sliding-window rate limiter.
- *
- * NOTE: In a multi-instance / serverless deployment each instance has its own
- * map, so the limit is per-instance. For stricter enforcement, move to a shared
- * store (e.g. Supabase, Redis). For a community app at this scale this provides
- * a meaningful friction increase without added infrastructure.
- */
+// Edge-compatible in-memory rate limiter.
+// server-only intentionally dropped — edge runtime doesn't support it.
+// The store is per-isolate; in Cloudflare Workers each isolate is long-lived
+// within a data-centre so the limiter still provides meaningful friction.
 
 interface Bucket {
   count: number;
-  /** Timestamp (ms) when this window resets */
   resetAt: number;
 }
 
 const store = new Map<string, Bucket>();
 
-/**
- * Returns `true` when the caller has exceeded the rate limit, `false` otherwise.
- *
- * @param key      Unique identifier (IP, visitor ID, etc.)
- * @param limit    Max requests allowed in the window
- * @param windowMs Window duration in milliseconds
- */
-export function isRateLimited(key: string, limit: number, windowMs: number): boolean {
+export function isRateLimited(
+  key: string,
+  limit: number,
+  windowMs: number,
+): boolean {
   const now = Date.now();
   const bucket = store.get(key);
 
   if (!bucket || now >= bucket.resetAt) {
-    // Start a fresh window
     store.set(key, { count: 1, resetAt: now + windowMs });
     return false;
   }
 
   bucket.count += 1;
-  if (bucket.count > limit) return true;
-  return false;
+  return bucket.count > limit;
 }
 
-/**
- * Extract the real client IP from a Next.js request, honouring common
- * reverse-proxy headers (Vercel, Cloudflare, etc.).
- */
 export function clientIp(request: Request): string {
   const headers = [
+    "cf-connecting-ip",        // Cloudflare — most accurate
     "x-real-ip",
-    "cf-connecting-ip",          // Cloudflare
-    "x-forwarded-for",           // standard proxy chain
-    "x-vercel-forwarded-for",    // Vercel edge
+    "x-forwarded-for",
+    "x-vercel-forwarded-for",
   ];
-  for (const header of headers) {
-    const value = (request as { headers: { get(k: string): string | null } }).headers.get(header);
-    if (value) return value.split(",")[0].trim();
+  for (const h of headers) {
+    const v = request.headers.get(h);
+    if (v) return v.split(",")[0].trim();
   }
   return "unknown";
 }
