@@ -100,8 +100,9 @@ export default function Home() {
   }
 
   const regions = ["Northern", "Central", "Southern"];
-  return <main className="app-shell">
-    <header className="topbar"><a className="brand" href="#home"><span className="brand-icon">FW</span><span>Fuel Wanga</span></a><span className="community-tag">COMMUNITY FUEL UPDATES</span></header>
+  return <>
+    <header className="topbar"><div className="app-shell topbar-inner"><a className="brand" href="#home"><span className="brand-icon">FW</span><span>Fuel Wanga</span></a><span className="community-tag">COMMUNITY FUEL UPDATES</span></div></header>
+    <main className="app-shell">
     <section className="intro" id="home"><span className="kicker">FUEL INFORMATION FOR MALAWI</span><h1>Find fuel near you.<br/><em>Help others find it too.</em></h1><p>See what drivers have reported. Share what you see at the station.</p></section>
     <section className="finder" aria-label="Find a filling station">
       <div className="district-label"><label htmlFor="district">Choose your district</label><span>{districts.length} districts covered</span></div>
@@ -125,5 +126,6 @@ export default function Home() {
 
       {formError && <p className="form-error" role="alert">{formError}</p>}
     </section></div>}
-  </main>;
+  </main>
+  </>;
 }

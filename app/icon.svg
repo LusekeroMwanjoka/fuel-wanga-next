@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Green rounded background -->
+  <rect width="32" height="32" rx="8" fill="#11684f"/>
+  <!-- Fuel pump body -->
+  <rect x="7" y="10" width="11" height="14" rx="2" fill="#fff"/>
+  <!-- Pump screen/display window -->
+  <rect x="9" y="12" width="7" height="4" rx="1" fill="#a8e6d0"/>
+  <!-- Nozzle arm -->
+  <path d="M18 14h4a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <!-- Nozzle tip -->
+  <rect x="20" y="18" width="1.5" height="3" rx="0.75" fill="#fff"/>
+  <!-- Fuel hose base -->
+  <line x1="18" y1="17" x2="18" y2="24" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+</svg>
