@@ -23,10 +23,14 @@ function assertSameOrigin(request: NextRequest): boolean {
 
 export async function GET(request: NextRequest) {
   const district = request.nextUrl.searchParams.get("district");
+<<<<<<< HEAD
   let query = supabaseAdmin
     .from("stations")
     .select("id,name,district,area,created_at")
     .order("name");
+=======
+  let query = supabaseAdmin.from("stations").select("id,name,district,area,latitude,longitude,source,source_url,source_checked_at,created_at").order("name");
+>>>>>>> 9d032107592a2252727e395a5490f5adee36cebc
   if (district && validDistrict(district)) query = query.ilike("district", district);
 
   const { data: stationRows, error: stationError } = await query;
@@ -61,6 +65,7 @@ export async function GET(request: NextRequest) {
   const stations = rows.map((station) => {
     const recent = byStation.get(station.id) ?? [];
     const latest = recent[0];
+<<<<<<< HEAD
     const matching = latest
       ? recent.filter((r) => r.fuel === latest.fuel && r.status === latest.status)
       : [];
@@ -80,12 +85,36 @@ export async function GET(request: NextRequest) {
       reportCount: recent.length,
       confirmations,
       conflict,
+=======
+    const matching = latest ? recent.filter(r => r.fuel === latest.fuel && r.status === latest.status) : [];
+    const confirmations = new Set(matching.map(r => r.reporter_key)).size;
+    const conflict = latest ? recent.some(r => r.fuel === latest.fuel && r.status !== latest.status) : false;
+    const fuelReports = Object.fromEntries((['Petrol', 'Diesel'] as const).map(fuel => {
+      const relevant = recent.filter(r => r.fuel === fuel || r.fuel === 'Both');
+      const current = relevant[0];
+      const sameStatus = current ? relevant.filter(r => r.status === current.status) : [];
+      return [fuel, {
+        status: current?.status ?? null,
+        queue: current?.queue ?? null,
+        lastReportAt: current?.created_at ?? null,
+        confirmations: new Set(sameStatus.map(r => r.reporter_key)).size,
+        conflict: current ? relevant.some(r => r.status !== current.status) : false,
+      }];
+    }));
+    return {
+      id: station.id, name: station.name, district: station.district, area: station.area,
+      latitude: station.latitude, longitude: station.longitude,
+      source: station.source, sourceUrl: station.source_url, sourceCheckedAt: station.source_checked_at,
+      status: latest?.status ?? null, fuel: latest?.fuel ?? null, queue: latest?.queue ?? null,
+      lastReportAt: latest?.created_at ?? null, reportCount: recent.length, confirmations, conflict, fuelReports,
+>>>>>>> 9d032107592a2252727e395a5490f5adee36cebc
     };
   });
 
   return NextResponse.json({ stations });
 }
 
+<<<<<<< HEAD
 export async function POST(request: NextRequest) {
   // Reject cross-origin requests
   if (!assertSameOrigin(request))
@@ -150,3 +179,5 @@ export async function POST(request: NextRequest) {
     { status: 201 },
   );
 }
+=======
+>>>>>>> 9d032107592a2252727e395a5490f5adee36cebc
