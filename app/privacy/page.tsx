@@ -49,10 +49,10 @@ export default function PrivacyPage() {
       </p>
       <h3>d) Station admin accounts</h3>
       <p>
-        If you hold a station-admin account created by a Fuel Wanga super admin, we store
-        your email address and a securely hashed password. We do not store your password in
-        plain text. This information is used only to authenticate you to your station
-        dashboard.
+        If you hold a station-admin account, Fuel Wanga stores your email address and
+        account details. Passwords are managed by Supabase Auth and are not stored by Fuel
+        Wanga in its application tables. This information is used to authenticate you to
+        your station dashboard.
       </p>
 
       <h2>3. Cookies and similar technologies</h2>
@@ -136,8 +136,7 @@ export default function PrivacyPage() {
       <p>
         Station and report data is stored in a Supabase PostgreSQL database with row-level
         security enabled. Only the server-side API can read or write data — no database
-        credentials are exposed to the browser. Admin passwords are hashed using PBKDF2-SHA256
-        before storage.
+        credentials are exposed to the browser. Admin passwords are managed by Supabase Auth.
       </p>
 
       <h2>7. Data retention</h2>

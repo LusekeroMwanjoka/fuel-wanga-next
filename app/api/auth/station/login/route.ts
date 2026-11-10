@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
-import { verifyPassword, applyStationAdminSession } from "@/lib/auth";
+import { applyStationAdminSession } from "@/lib/auth";
+import { signInWithSupabasePassword } from "@/lib/supabasePasswordAuth";
 import { isRateLimited, clientIp } from "@/lib/rateLimit";
 
 export const runtime = "edge";
@@ -23,19 +24,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Incorrect email or password." }, { status: 401 });
   }
 
-  const { data: admin } = await getSupabaseAdmin()
-    .from("station_admins")
-    .select("id, password_hash, is_active, display_name, station_id")
-    .eq("email", email)
-    .single();
-
-  const dummy =
-    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-  const valid = await verifyPassword(password, admin?.password_hash ?? dummy);
-
-  if (!admin || !valid) {
+  const { data: authData, error: authError } = await signInWithSupabasePassword(email, password);
+  if (authError || !authData.user) {
     return NextResponse.json({ error: "Incorrect email or password." }, { status: 401 });
   }
+
+  const { data: profile } = await getSupabaseAdmin()
+    .from("profiles")
+    .select("id, role, station_id, display_name")
+    .eq("id", authData.user.id)
+    .single();
+  if (profile?.role !== "station_admin" || !profile.station_id) {
+    return NextResponse.json({ error: "This account is not a station admin." }, { status: 403 });
+  }
+
+  const { data: admin } = await getSupabaseAdmin()
+    .from("station_admins")
+    .select("id, auth_user_id, is_active, display_name, station_id, email")
+    .eq("auth_user_id", authData.user.id)
+    .eq("station_id", profile.station_id)
+    .single();
+  if (!admin) return NextResponse.json({ error: "Station admin account not found." }, { status: 403 });
   if (!admin.is_active) {
     return NextResponse.json(
       { error: "This account has been disabled. Contact the super admin." },
@@ -49,5 +58,5 @@ export async function POST(request: NextRequest) {
     stationId: admin.station_id,
     displayName: admin.display_name,
   });
-  return applyStationAdminSession(res, admin.id);
+  return applyStationAdminSession(res, authData.user.id);
 }

@@ -72,10 +72,19 @@ export async function getStationAdminSession(request: NextRequest): Promise<{
   const token = request.cookies.get(STATION_ADMIN_COOKIE)?.value;
   if (!token || !isUuid(token)) return null;
 
+  const { data: profile } = await getSupabaseAdmin()
+    .from("profiles")
+    .select("id, role, station_id, display_name")
+    .eq("id", token)
+    .eq("role", "station_admin")
+    .single();
+  if (!profile?.station_id) return null;
+
   const { data } = await getSupabaseAdmin()
     .from("station_admins")
     .select("id, station_id, email, display_name")
-    .eq("id", token)
+    .eq("auth_user_id", token)
+    .eq("station_id", profile.station_id)
     .eq("is_active", true)
     .single();
 
@@ -88,63 +97,16 @@ export async function getSuperAdminSession(
   const token = request.cookies.get(SUPER_ADMIN_COOKIE)?.value;
   if (!token || !isUuid(token)) return null;
 
-  const { data } = await getSupabaseAdmin()
-    .from("super_admins")
-    .select("id, email")
+  const { data: profile } = await getSupabaseAdmin()
+    .from("profiles")
+    .select("id, role")
     .eq("id", token)
+    .eq("role", "super_admin")
     .single();
 
-  return data ?? null;
-}
-
-// ── Password hashing — Web Crypto (works on both Node and Edge) ──────────────
-const ITERATIONS = 310_000;
-
-export async function hashPassword(password: string): Promise<string> {
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const key = await deriveKey(password, salt);
-  const hash = await crypto.subtle.exportKey("raw", key);
-  const combined = new Uint8Array(16 + new Uint8Array(hash).length);
-  combined.set(salt);
-  combined.set(new Uint8Array(hash), 16);
-  return btoa(String.fromCharCode(...combined));
-}
-
-export async function verifyPassword(
-  password: string,
-  stored: string,
-): Promise<boolean> {
-  try {
-    const combined = Uint8Array.from(atob(stored), (c) => c.charCodeAt(0));
-    const salt = combined.slice(0, 16);
-    const storedHash = combined.slice(16);
-    const key = await deriveKey(password, salt);
-    const hash = new Uint8Array(await crypto.subtle.exportKey("raw", key));
-    if (hash.length !== storedHash.length) return false;
-    let diff = 0;
-    for (let i = 0; i < hash.length; i++) diff |= hash[i] ^ storedHash[i];
-    return diff === 0;
-  } catch {
-    return false;
-  }
-}
-
-async function deriveKey(password: string, salt: Uint8Array): Promise<CryptoKey> {
-  const enc = new TextEncoder();
-  const base = await crypto.subtle.importKey(
-    "raw",
-    enc.encode(password),
-    "PBKDF2",
-    false,
-    ["deriveBits", "deriveKey"],
-  );
-  return crypto.subtle.deriveKey(
-    { name: "PBKDF2", salt: salt as unknown as ArrayBuffer, iterations: ITERATIONS, hash: "SHA-256" },
-    base,
-    { name: "HMAC", hash: "SHA-256", length: 256 },
-    true,
-    ["sign"],
-  );
+  if (!profile) return null;
+  const { data: userData } = await getSupabaseAdmin().auth.admin.getUserById(token);
+  return userData.user ? { id: token, email: userData.user.email ?? "" } : null;
 }
 
 function isUuid(v: string): boolean {

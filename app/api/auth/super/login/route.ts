@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
-import { verifyPassword, applySuperAdminSession } from "@/lib/auth";
+import { applySuperAdminSession } from "@/lib/auth";
+import { signInWithSupabasePassword } from "@/lib/supabasePasswordAuth";
 import { isRateLimited, clientIp } from "@/lib/rateLimit";
 
 export const runtime = "edge";
@@ -23,20 +24,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Incorrect email or password." }, { status: 401 });
   }
 
-  const { data: admin } = await getSupabaseAdmin()
-    .from("super_admins")
-    .select("id, password_hash")
-    .eq("email", email)
-    .single();
-
-  const dummy =
-    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-  const valid = await verifyPassword(password, admin?.password_hash ?? dummy);
-
-  if (!admin || !valid) {
+  const { data: authData, error: authError } = await signInWithSupabasePassword(email, password);
+  if (authError || !authData.user) {
     return NextResponse.json({ error: "Incorrect email or password." }, { status: 401 });
   }
 
+  const { data: profile } = await getSupabaseAdmin()
+    .from("profiles")
+    .select("role")
+    .eq("id", authData.user.id)
+    .single();
+  if (profile?.role !== "super_admin") {
+    return NextResponse.json({ error: "This account is not a super admin." }, { status: 403 });
+  }
+
   const res = NextResponse.json({ ok: true });
-  return applySuperAdminSession(res, admin.id);
+  return applySuperAdminSession(res, authData.user.id);
 }

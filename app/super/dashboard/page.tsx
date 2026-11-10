@@ -69,7 +69,7 @@ export default function SuperDashboard() {
   }
 
   function openCreate() {
-    setFormEmail(""); setFormDisplayName(""); setFormStationId(""); setFormPassword(""); setFormError("");
+    setFormEmail(""); setFormDisplayName(""); setFormStationId(""); setFormError("");
     setModal({ type: "create" });
   }
 
@@ -91,7 +91,7 @@ export default function SuperDashboard() {
       const res = await fetch("/api/super/admins", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formEmail, password: formPassword, displayName: formDisplayName, stationId: formStationId }),
+        body: JSON.stringify({ email: formEmail, displayName: formDisplayName, stationId: formStationId }),
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error);
@@ -254,8 +254,7 @@ export default function SuperDashboard() {
                   <option value="">Select a station…</option>
                   {stations.map(s => <option key={s.id} value={s.id}>{s.name} ({s.district})</option>)}
                 </select>
-                <label className="modal-label" htmlFor="c-pass">{t.passwordLabel[lang]}</label>
-                <input id="c-pass" className="modal-input" type="password" value={formPassword} onChange={e => setFormPassword(e.target.value)} required minLength={10} />
+                <p className="admin-empty">Supabase Auth will send an account invitation to this email. The user sets their own password.</p>
                 {formError && <p className="form-error" role="alert">{formError}</p>}
                 <button className="primary-button full" disabled={busy}>{busy ? t.saving[lang] : t.createAdmin[lang]}</button>
               </form>
