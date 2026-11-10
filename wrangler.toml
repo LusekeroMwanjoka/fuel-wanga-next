@@ -4,8 +4,3 @@ compatibility_flags = ["nodejs_compat"]
 
 pages_build_output_dir = ".vercel/output/static"
 
-# Env vars are set in the Cloudflare Pages dashboard — do NOT put real values here.
-# Dashboard → Pages → your project → Settings → Environment Variables
-[vars]
-SUPABASE_URL = ""
-SUPABASE_SECRET_KEY = ""
