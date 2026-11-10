@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
   let query = sb
     .from("stations")
     .select("id,name,district,area,latitude,longitude,created_at")
+    .eq("is_active", true)
     .order("name");
   if (district && validDistrict(district)) query = query.ilike("district", district);
 

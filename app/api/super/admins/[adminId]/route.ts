@@ -24,7 +24,7 @@ export async function PATCH(request: NextRequest, { params }: Context) {
   if (typeof body?.displayName === "string") update.display_name = body.displayName.trim();
   if (typeof body?.isActive === "boolean") update.is_active = body.isActive;
   if (typeof body?.stationId === "string") {
-    const { data: st } = await getSupabaseAdmin().from("stations").select("id").eq("id", body.stationId).single();
+    const { data: st } = await getSupabaseAdmin().from("stations").select("id").eq("id", body.stationId).eq("is_active", true).single();
     if (!st) return NextResponse.json({ error: "Station not found." }, { status: 404 });
     update.station_id = body.stationId;
   }

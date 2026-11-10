@@ -88,7 +88,14 @@ export async function getStationAdminSession(request: NextRequest): Promise<{
     .eq("is_active", true)
     .single();
 
-  return data ?? null;
+  if (!data) return null;
+  const { data: station } = await getSupabaseAdmin()
+    .from("stations")
+    .select("id")
+    .eq("id", data.station_id)
+    .eq("is_active", true)
+    .maybeSingle();
+  return station ? data : null;
 }
 
 export async function getSuperAdminSession(

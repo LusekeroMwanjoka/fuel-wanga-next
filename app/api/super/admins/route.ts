@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
     .from("stations")
     .select("id")
     .eq("id", stationId)
+    .eq("is_active", true)
     .single();
   if (!station) return NextResponse.json({ error: "Station not found." }, { status: 404 });
 

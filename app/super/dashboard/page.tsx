@@ -15,7 +15,7 @@ type StationAdmin = {
   created_at: string;
   stations: { id: string; name: string; district: string } | null;
 };
-type Station = { id: string; name: string; district: string; area: string };
+type Station = { id: string; name: string; district: string; area: string; is_active: boolean };
 
 type ModalState =
   | { type: "create" }
@@ -40,6 +40,7 @@ export default function SuperDashboard() {
   const [formPassword, setFormPassword] = useState("");
   const [formError, setFormError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [busyStationId, setBusyStationId] = useState("");
 
   useEffect(() => {
     const stored = localStorage.getItem("fw-lang") as Lang | null;
@@ -154,6 +155,31 @@ export default function SuperDashboard() {
     } catch { /* silent */ }
   }
 
+  async function manageStation(station: Station, action: "activate" | "deactivate" | "delete") {
+    if (busyStationId) return;
+    if (action === "delete" && !window.confirm(`Permanently delete ${station.name}? This is allowed only when it has no reports or admin records. Deactivate it to keep its history.`)) return;
+    setBusyStationId(station.id);
+    try {
+      const res = await fetch("/api/super/stations", {
+        method: action === "delete" ? "DELETE" : "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(action === "delete"
+          ? { stationId: station.id }
+          : { stationId: station.id, isActive: action === "activate" }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error ?? "Could not update station.");
+      setNotice(action === "delete" ? "Station deleted." : `Station ${action}d.`);
+      setTimeout(() => setNotice(""), 4000);
+      await load();
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : "Could not update station.");
+      setTimeout(() => setNotice(""), 5000);
+    } finally {
+      setBusyStationId("");
+    }
+  }
+
   return (
     <div className="admin-shell">
       <header className="admin-topbar">
@@ -227,6 +253,15 @@ export default function SuperDashboard() {
                   <div>
                     <p className="super-admin-name">{s.name}</p>
                     <p className="super-admin-email">{s.district} · {s.area}</p>
+                    {!s.is_active && <span className="disabled-badge">Inactive</span>}
+                  </div>
+                  <div className="super-admin-actions">
+                    <button className="secondary-button" disabled={busyStationId === s.id} onClick={() => manageStation(s, s.is_active ? "deactivate" : "activate")}>
+                      {busyStationId === s.id ? "Saving…" : s.is_active ? "Deactivate" : "Activate"}
+                    </button>
+                    <button className="secondary-button" disabled={busyStationId === s.id} onClick={() => manageStation(s, "delete")}>
+                      Delete
+                    </button>
                   </div>
                 </div>
               ))}
